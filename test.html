@@ -10,7 +10,7 @@
 		<div id="phaser-canvas"></div>
 	</body>
 	<script type="text/javascript">
-		var game = new Phaser.Game(960, 320, Phaser.AUTO, "phaser-canvas");
+		var game = new Phaser.Game(600, 320, Phaser.AUTO, "phaser-canvas");
 
 	    var Character = function (game, x, y, spriteKey, scale) {
 
@@ -47,8 +47,8 @@
 
 	        preload: function () {
 	        	this.load.spritesheet("dude", "assets/sprites/dude.png", 32, 48);
-      			this.load.image("tiles", "assets/maps/super_mario.png");
-      			this.load.tilemap("scene", "assets/maps/tiled_mario.json", null, Phaser.Tilemap.TILED_JSON);
+      			this.load.image("tiles", "assets/sprites/office_ud.png");
+      			this.load.tilemap("scene", "assets/maps/oficina.json", null, Phaser.Tilemap.TILED_JSON);
 
 	            this.load.bitmapFont("shmupfont", "assets/fonts/shmupfont.png", "assets/fonts/shmupfont.xml");
 	        },
@@ -56,20 +56,28 @@
 	        create: function () {
 
 	        	this.map = this.add.tilemap("scene");
-				this.map.addTilesetImage("SuperMarioBros-World1-1", "tiles");
+				this.map.addTilesetImage("office", "tiles");
 
-				this.map.setCollisionBetween(15, 15);
+				// this.map.setCollisionBetween(17, 17);
+				// this.map.setCollisionBetween(320, 320);
+				// this.map.setCollisionBetween(68, 68);
+				// this.map.setCollisionBetween(136, 136);
+				this.map.setCollisionBetween(232, 239);
+				this.map.setCollisionBetween(241, 254);
+				this.map.setCollisionBetween(256, 320);
+				this.map.setCollisionBetween(8, 191);
 
-				this.layer = this.map.createLayer("World1");
-				this.layer.fixedToCamera = false;
+
+				this.layer = this.map.createLayer("layer1");
+				this.layer.fixedToCamera = true;
 
 				// this.layer.debug = true;
 				// this.layer.resizeWorld();
 
-				this.player = new Character(this.game, 5, 5, "dude", 0.6);
+				this.player = new Character(this.game, 50,570, "dude", 0.7);
 
 
-				this.physics.arcade.gravity.y = 250;
+				// this.physics.arcade.gravity.y = 250;
 				this.physics.enable(this.player);
 
 				this.player.body.collideWorldBounds = true;
@@ -81,29 +89,33 @@
 				this.player.animations.add("right", [5,6,7,8], 10, true);
 				this.player.frame = 4;
 
-				//maybe this.game
-				this.cursors = this.input.keyboard.createCursorKeys();
-
 	            // this.dude = new Character(this.game, 130, 200, "dude", 1.2);
 
 	            this.add.existing(this.player);
+	            //follow player
+	            this.game.world.setBounds(0, 0, 1920, 640);
+	            this.game.camera.follow(this.player);
+	            // this.game.camera.deadzone = new Phaser.Rectangle(100, 100, 600, 400);
+				this.cursors = this.input.keyboard.createCursorKeys();
 	        },
 
 	        update: function () {
 	        	this.physics.arcade.collide(this.player, this.layer);
 				this.player.body.velocity.x = 0;
+				this.player.body.velocity.y = 0;
 
 				if(this.cursors.up.isDown){
-					if(this.player.body.onFloor()){
-					  this.player.body.velocity.y = -200;
-					}
+					this.player.body.velocity.y = -200;
 				}
-				if(this.cursors.left.isDown){
-					this.player.body.velocity.x = -150;
+				else if(this.cursors.down.isDown){
+					this.player.body.velocity.y = 200;
+				}
+				else if(this.cursors.left.isDown){
+					this.player.body.velocity.x = -200;
 					this.player.animations.play("left");
 				}
 				else if(this.cursors.right.isDown){
-					this.player.body.velocity.x = 150;
+					this.player.body.velocity.x = 200;
 					this.player.animations.play("right");
 				}
 				else {
@@ -112,6 +124,7 @@
 				}
 	        },
 	        render: function(){
+	        	// console.log(this.player.body.position.x, this.player.body.position.y);
 	        	// this.game.debug.body(this.player, "#888888", true);
 	        },
 
