@@ -4,10 +4,15 @@
 		<meta charset="utf-8">
 		<title>Juego Phaser</title>
 		<link rel="icon" href="assets/sprites/mario.png">
-		<script src="bower_components/phaser/build/phaser.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/dialog-box.css">
+		<script src="phaser-latest/phaser.min.js"></script>
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
 	</head>
 	<body>
-		<div id="phaser-canvas"></div>
+		<div id="phaser-canvas" class="game"></div>
+		<div class="dialog-box">
+			<span id="console" class="noselect">...</span>
+		</div>
 	</body>
 	<script type="text/javascript">
 		var game = new Phaser.Game(600, 320, Phaser.AUTO, "phaser-canvas");
@@ -47,6 +52,8 @@
 
 	        preload: function () {
 	        	this.load.spritesheet("dude", "assets/sprites/dude.png", 32, 48);
+	        	this.load.image("mario", "assets/sprites/mario.png");
+	        	this.load.spritesheet("pokemon", "assets/sprites/pokemon.png", 31, 32);
       			this.load.image("tiles", "assets/sprites/office_ud.png");
       			this.load.tilemap("scene", "assets/maps/oficina.json", null, Phaser.Tilemap.TILED_JSON);
 
@@ -58,10 +65,6 @@
 	        	this.map = this.add.tilemap("scene");
 				this.map.addTilesetImage("office", "tiles");
 
-				// this.map.setCollisionBetween(17, 17);
-				// this.map.setCollisionBetween(320, 320);
-				// this.map.setCollisionBetween(68, 68);
-				// this.map.setCollisionBetween(136, 136);
 				this.map.setCollisionBetween(232, 239);
 				this.map.setCollisionBetween(241, 254);
 				this.map.setCollisionBetween(256, 320);
@@ -69,12 +72,18 @@
 
 
 				this.layer = this.map.createLayer("layer1");
+				this.layer2 = this.map.createLayer("layer2");
+				this.layer3 = this.map.createLayer("layer3");
+
 				this.layer.fixedToCamera = true;
+				this.layer2.fixedToCamera = true;
+				this.layer3.fixedToCamera = true;
+
 
 				// this.layer.debug = true;
 				// this.layer.resizeWorld();
 
-				this.player = new Character(this.game, 50,570, "dude", 0.7);
+				this.player = new Character(this.game, 50,570, "pokemon", 0.9);
 
 
 				// this.physics.arcade.gravity.y = 250;
@@ -85,18 +94,38 @@
 				this.player.inputEnabled = true;
 				this.player.events.onInputDown.add(this.listener, this);
 
-				this.player.animations.add("left", [0,1,2,3], 10, true);
-				this.player.animations.add("right", [5,6,7,8], 10, true);
-				this.player.frame = 4;
+				this.player.animations.add("walkingLeft", [3,4,5], 10, true);
+				this.player.animations.add("walkingRight", [6,7,8], 10, true);
+				this.player.animations.add("walkingDown", [0,1,2], 10, true);
+				this.player.animations.add("walkingUp", [9,10,11], 10, true);
+
+				this.player.frame = 1;
 
 	            // this.dude = new Character(this.game, 130, 200, "dude", 1.2);
 
 	            this.add.existing(this.player);
+
+	            // console.log(this.layer3);
+	            // console.log(this.player);
+	            // this.layer3.bringToTop();
+
 	            //follow player
 	            this.game.world.setBounds(0, 0, 1920, 640);
 	            this.game.camera.follow(this.player);
 	            // this.game.camera.deadzone = new Phaser.Rectangle(100, 100, 600, 400);
 				this.cursors = this.input.keyboard.createCursorKeys();
+
+				this.actionKeys = this.input.keyboard.addKeys({
+					"examine": Phaser.Keyboard.S,
+					"cancel": Phaser.Keyboard.A
+				});
+
+				this.actionKeys["examine"].onDown.add(this.examineButton, this);
+
+				this.boss = this.add.sprite(870, 67, "mario");
+				this.boss.scale.set(0.11, 0.11);
+
+				console.log("actionKeys", this.actionKeys);
 	        },
 
 	        update: function () {
@@ -106,21 +135,23 @@
 
 				if(this.cursors.up.isDown){
 					this.player.body.velocity.y = -200;
+					this.player.animations.play("walkingUp");
 				}
 				else if(this.cursors.down.isDown){
 					this.player.body.velocity.y = 200;
+					this.player.animations.play("walkingDown");
 				}
 				else if(this.cursors.left.isDown){
 					this.player.body.velocity.x = -200;
-					this.player.animations.play("left");
+					this.player.animations.play("walkingLeft");
 				}
 				else if(this.cursors.right.isDown){
 					this.player.body.velocity.x = 200;
-					this.player.animations.play("right");
+					this.player.animations.play("walkingRight");
 				}
 				else {
 					this.player.animations.stop();
-					this.player.frame = 4;
+					// this.player.frame = 1;
 				}
 	        },
 	        render: function(){
@@ -130,6 +161,18 @@
 
 	        listener: function(){
 	        	console.log("I'm not Mario");
+	        },
+
+	        examineButton: function(){
+	        	console.log("Checking...");
+	        	var message = "...";
+	        	if(this.player.body.position.x < 1092 && this.player.body.position.x >= 800){
+	        		if(this.player.body.position.y < 580 && this.player.body.position.y >= 510){
+	        			message = "Es el espacio de trabajo de la secretaria...";
+	        		}
+	        	}
+
+	        	$("#console").text(message);
 	        }
 
 	    };

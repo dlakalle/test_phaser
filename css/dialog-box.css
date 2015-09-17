@@ -1,0 +1,37 @@
+.dialog-box {
+    position: absolute;
+    left: 690px;
+    top: 30px;
+    width: 600px;
+    height: 160px;
+    background: linear-gradient(135deg,#002147,#FF8000);
+    border-radius: 20px;
+    box-shadow: 10px 10px 5px #888888;
+}
+
+.dialog-box > span {
+    color: #FFF;
+    font-weight: bolder;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+    height: 100%;
+    width: 100%;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.game {
+    position: absolute;
+    top: 35px;
+    left: 50px;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
